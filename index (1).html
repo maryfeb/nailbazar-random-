@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Маникюрный рандом — Nail Bazar</title>
+<style>
+:root{font-family:Arial,Helvetica,sans-serif;color:#171717;background:#fff}*{box-sizing:border-box}
+body{margin:0}.wrap{max-width:1180px;margin:auto;padding:38px 22px 44px}
+.eyebrow{font-size:11px;letter-spacing:.15em;font-weight:700;color:#888}
+header{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:32px}
+h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(32px,5vw,62px);letter-spacing:-.045em;line-height:1.05;margin:10px 0 12px}
+.subtitle{color:#777;font-size:15px;line-height:1.5;margin:0;max-width:480px}
+.counter{font-size:12px;color:#888;white-space:nowrap}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.card{border:1px solid #ececec;border-radius:12px;overflow:hidden;min-width:0;background:#fff}
+.photo{aspect-ratio:4/4.2;background:#f6f5f4;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.photo img{width:100%;height:100%;object-fit:cover;display:block}
+.placeholder{width:68%;height:65%;border-radius:22px 22px 30px 30px;background:linear-gradient(135deg,var(--shade),#fff 160%);box-shadow:18px 22px 32px #0000000b;display:flex;align-items:center;justify-content:center;color:#ffffffbb;font-size:56px;font-family:Georgia,serif}
+.lock{position:absolute;right:10px;top:10px;background:#fff;border:1px solid #e8e8e8;border-radius:100px;padding:9px 11px;cursor:pointer;font-size:12px;box-shadow:0 2px 10px #0000000b}
+.lock[aria-pressed=true]{background:#171717;color:#fff;border-color:#171717}
+.details{padding:16px;min-height:112px;display:flex;flex-direction:column;gap:8px}
+.category{font-size:10px;color:#999;letter-spacing:.1em;text-transform:uppercase}
+.name{font-size:15px;font-weight:600;line-height:1.35;min-height:40px}
+.link{color:#171717;font-size:12px;text-underline-offset:3px;margin-top:auto}
+.link.disabled{color:#aaa;text-decoration:none;cursor:default}
+.actions{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:28px}
+.shuffle{background:#171717;color:white;border:0;border-radius:9px;padding:17px 28px;font-size:15px;cursor:pointer}
+.shuffle:hover{background:#333}.hint{font-size:13px;color:#888}
+.note{border-top:1px solid #eee;margin-top:30px;padding-top:15px;color:#999;font-size:12px;line-height:1.5}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.wrap{padding:28px 16px}.counter{display:none}}
+@media(max-width:420px){.grid{gap:10px}.details{padding:12px}.name{font-size:13px}.shuffle{width:100%}.photo{aspect-ratio:1/1.1}}
+@media(prefers-reduced-motion:no-preference){.photo img,.placeholder{animation:pop .3s ease}@keyframes pop{from{opacity:.5;transform:scale(.96)}to{opacity:1;transform:scale(1)}}}
+</style></head><body><main class="wrap">
+<header><div><div class="eyebrow">NAIL BAZAR / RANDOM PICK</div><h1>Твоя случайная четвёрка</h1><p class="subtitle">Четыре находки для маникюра. Не понравился набор? Перемешай ещё. Любимые товары можно закрепить.</p></div><div class="counter" id="counter">Комбинация № 1</div></header>
+<section class="grid" id="grid" aria-label="Случайные товары"></section>
+<div class="actions"><button class="shuffle" id="shuffle" type="button">↻ Перемешать ещё</button><span class="hint">Нажми «Закрепить», чтобы оставить товар на месте</span></div>
+<p class="note">Демонстрационный каталог: названия условные. Чтобы открыть настоящие товары, добавь ссылки и фотографии в массив PRODUCTS внутри файла.</p>
+</main><script>
+const PRODUCTS = [
+  {
+    "id": "1-1",
+    "category": 0,
+    "name": "Молочный нюд",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "1-2",
+    "category": 0,
+    "name": "Вишнёвый глянец",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "1-3",
+    "category": 0,
+    "name": "Розовый jelly",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "1-4",
+    "category": 0,
+    "name": "Кофейный крем",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "1-5",
+    "category": 0,
+    "name": "Лавандовый туман",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "1-6",
+    "category": 0,
+    "name": "Красный лак",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "1-7",
+    "category": 0,
+    "name": "Пыльная роза",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "1-8",
+    "category": 0,
+    "name": "Шоколад",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "1-9",
+    "category": 0,
+    "name": "Оливковый",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "1-10",
+    "category": 0,
+    "name": "Серебряный шиммер",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "1-11",
+    "category": 0,
+    "name": "Персиковый",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "1-12",
+    "category": 0,
+    "name": "Бордовый",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "1-13",
+    "category": 0,
+    "name": "Голубой лёд",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "1-14",
+    "category": 0,
+    "name": "Карамель",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "1-15",
+    "category": 0,
+    "name": "Чёрный глянец",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "2-1",
+    "category": 1,
+    "name": "Безворсовые салфетки",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "2-2",
+    "category": 1,
+    "name": "Пилка 180/240",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "2-3",
+    "category": 1,
+    "name": "Баф для ногтей",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "2-4",
+    "category": 1,
+    "name": "Апельсиновые палочки",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "2-5",
+    "category": 1,
+    "name": "Щёточка для пыли",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "2-6",
+    "category": 1,
+    "name": "Формы для наращивания",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "2-7",
+    "category": 1,
+    "name": "Одноразовые полотенца",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "2-8",
+    "category": 1,
+    "name": "Колпачки для снятия",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "2-9",
+    "category": 1,
+    "name": "Разделители пальцев",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "2-10",
+    "category": 1,
+    "name": "Перчатки мастера",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "3-1",
+    "category": 2,
+    "name": "Камуфлирующая база",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "3-2",
+    "category": 2,
+    "name": "Глянцевый топ",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "3-3",
+    "category": 2,
+    "name": "Матовый топ",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "3-4",
+    "category": 2,
+    "name": "Гель для укрепления",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "3-5",
+    "category": 2,
+    "name": "Праймер",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "3-6",
+    "category": 2,
+    "name": "Дегидратор",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "3-7",
+    "category": 2,
+    "name": "Полигель",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "3-8",
+    "category": 2,
+    "name": "Моделирующий гель",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "3-9",
+    "category": 2,
+    "name": "База с шиммером",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "3-10",
+    "category": 2,
+    "name": "Топ без липкого слоя",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "3-11",
+    "category": 2,
+    "name": "Гель-желе",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "3-12",
+    "category": 2,
+    "name": "Каучуковая база",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "3-13",
+    "category": 2,
+    "name": "Гель для дизайна",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "3-14",
+    "category": 2,
+    "name": "Липидопротектор",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "3-15",
+    "category": 2,
+    "name": "Бонд",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "4-1",
+    "category": 3,
+    "name": "Хромовая втирка",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "4-2",
+    "category": 3,
+    "name": "Магнит Cat Eye",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "4-3",
+    "category": 3,
+    "name": "Масло для кутикулы",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "4-4",
+    "category": 3,
+    "name": "Стразы",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "4-5",
+    "category": 3,
+    "name": "Слайдер-дизайн",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "4-6",
+    "category": 3,
+    "name": "Кисть для тонких линий",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "4-7",
+    "category": 3,
+    "name": "Пинцет для декора",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "4-8",
+    "category": 3,
+    "name": "Фольга для дизайна",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "4-9",
+    "category": 3,
+    "name": "Палитра для выкраски",
+    "image": "",
+    "url": ""
+  },
+  {
+    "id": "4-10",
+    "category": 3,
+    "name": "Пигмент жемчуг",
+    "image": "",
+    "url": ""
+  }
+];
+const COLORS=['#e8a8c2','#d5cbc2','#b4a2be','#d5b0a1'];
+const LABELS=['Гель-лаки','Расходники','Материалы','Находки'];
+const grid=document.getElementById('grid'),counter=document.getElementById('counter');
+const pools=LABELS.map((_,i)=>PRODUCTS.filter(p=>p.category===i));
+let current=[],locked=[false,false,false,false],round=0;
+function pick(pool,old){const options=pool.filter(p=>p.id!==old?.id);return (options.length?options:pool)[Math.floor(Math.random()*(options.length||pool.length))]}
+function draw(){grid.replaceChildren();current.forEach((p,i)=>{const card=document.createElement('article');card.className='card';const photo=document.createElement('div');photo.className='photo';if(p.image){const img=document.createElement('img');img.src=p.image;img.alt=p.name;img.loading='lazy';photo.append(img)}else{const placeholder=document.createElement('div');placeholder.className='placeholder';placeholder.style.setProperty('--shade',COLORS[i]);placeholder.textContent=['✦','▤','◉','✳'][i];photo.append(placeholder)}
+const lock=document.createElement('button');lock.className='lock';lock.type='button';lock.setAttribute('aria-pressed',String(locked[i]));lock.textContent=locked[i]?'✓ Закреплено':'♧ Закрепить';lock.addEventListener('click',()=>{locked[i]=!locked[i];draw()});photo.append(lock);
+const details=document.createElement('div');details.className='details';const cat=document.createElement('div');cat.className='category';cat.textContent=LABELS[i];const name=document.createElement('div');name.className='name';name.textContent=p.name;const link=document.createElement(p.url?'a':'span');link.className='link'+(p.url?'':' disabled');link.textContent=p.url?'Смотреть товар ↗':'Ссылка пока не добавлена';if(p.url){link.href=p.url;link.target='_top';link.rel='noopener'}details.append(cat,name,link);card.append(photo,details);grid.append(card)});counter.textContent='Комбинация № '+(round+1)}
+function shuffle(){current=pools.map((pool,i)=>locked[i]&&current[i]?current[i]:pick(pool,current[i]));round++;draw()}
+document.getElementById('shuffle').addEventListener('click',shuffle);shuffle();
+</script></body></html>
